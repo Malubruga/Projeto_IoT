@@ -1,1 +1,331 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
 
+// Entrada do LCD
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+Servo servoPorta;
+
+// Declaração dos botões
+const int botao1 = 6;
+const int botao2 = 7;
+const int botao3 = 8;
+const int botaoReset = 9;
+
+const int buzzer = 10;
+const int ldr = A0;
+const int pinoServo = 13;
+
+// Senha correta
+String senhaCorreta = "123";
+String senhaDigitada = "";
+
+// Controle de tentativas
+int tentativas = 0;
+
+// Estados do sistema
+bool bloqueado = false;
+bool cofreAberto = false;
+
+// Limite de luz do LDR
+int limiteLuz = 700;
+
+void setup() {
+
+  // Inicializa o LCD
+  lcd.begin(16, 2);
+
+  // Define os botões como INPUT_PULLUP (usa resistor interno)
+  pinMode(botao1, INPUT_PULLUP);
+  pinMode(botao2, INPUT_PULLUP);
+  pinMode(botao3, INPUT_PULLUP);
+  pinMode(botaoReset, INPUT_PULLUP);
+
+  // Define buzzer como saída
+  pinMode(buzzer, OUTPUT);
+
+  // Inicializa o servo
+  servoPorta.attach(pinoServo);
+
+  // Começa com o cofre fechado
+  servoPorta.write(0);
+
+  telaInicial();
+}
+
+void loop() {
+
+  // Se apertar o botão reset, reinicia o sistema
+  if (digitalRead(botaoReset) == LOW) {
+    resetarSistema();
+    return;
+  }
+
+  // Se o sistema estiver bloqueado (3 erros)
+  if (bloqueado) {
+
+    lcd.setCursor(0, 0);
+    lcd.print("BLOQUEADO       ");
+
+    lcd.setCursor(0, 1);
+    lcd.print("Aperte reset    ");
+
+    // Alarme contínuo
+    tone(buzzer, 1000);
+
+    delay(100);
+
+    return;
+  }
+
+  // Leitura do sensor de luz
+  int valorLuz = analogRead(ldr);
+
+  // Se o cofre está fechado e entrou luz = arrombamento
+  if (cofreAberto == false && valorLuz > limiteLuz) {
+
+    // Abre o cofre simulando um arrombamento
+    cofreAberto = true;
+    servoPorta.write(90);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("ALERTA!");
+
+    lcd.setCursor(0, 1);
+    lcd.print("Arrombamento");
+
+    tone(buzzer, 1200);
+    delay(300);
+  }
+
+  // Se o cofre estiver aberto, mostra o estado da luz
+  if (cofreAberto == true) {
+
+    mostrarStatusLuz();
+
+    delay(500);
+
+    return;
+  }
+
+  // Se nada disso acontecer, continua lendo a senha
+  lerSenha();
+}
+
+// Função para detectar clique do botão
+bool apertou(int botao) {
+
+  if (digitalRead(botao) == LOW) {
+
+    delay(50);
+
+    if (digitalRead(botao) == LOW) {
+
+      // Espera o botão ser solto
+      while (digitalRead(botao) == LOW) {
+        delay(10);
+      }
+
+      delay(50);
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Função que lê a senha digitada
+void lerSenha() {
+
+  if (apertou(botao1)) {
+    senhaDigitada += "1";
+    atualizarLCD();
+  }
+
+  if (apertou(botao2)) {
+    senhaDigitada += "2";
+    atualizarLCD();
+  }
+
+  if (apertou(botao3)) {
+    senhaDigitada += "3";
+    atualizarLCD();
+  }
+
+  // Quando chega em 3 dígitos, verifica a senha
+  if (senhaDigitada.length() == 3) {
+
+    delay(300);
+
+    verificarSenha();
+  }
+}
+
+// Compara senha digitada com a correta
+void verificarSenha() {
+
+  if (senhaDigitada == senhaCorreta) {
+
+    abrirCofre();
+
+  } else {
+
+    senhaErrada();
+  }
+}
+
+// Atualiza o LCD mostrando * no lugar dos números
+void atualizarLCD() {
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Senha:");
+
+  lcd.setCursor(0, 1);
+
+  for (int i = 0; i < senhaDigitada.length(); i++) {
+    lcd.print("*");
+  }
+}
+
+// Abre o cofre
+void abrirCofre() {
+
+  cofreAberto = true;
+
+  senhaDigitada = "";
+  tentativas = 0;
+
+  // Gira o servo (abre a porta)
+  servoPorta.write(90);
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Senha correta");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Cofre aberto");
+
+  // Som de abertura
+  tone(buzzer, 1200);
+  delay(200);
+  noTone(buzzer);
+  delay(200);
+
+  tone(buzzer, 1200);
+  delay(200);
+  noTone(buzzer);
+
+  delay(2000);
+
+  mostrarStatusLuz();
+}
+
+// Mostra se tem luz ou não dentro do cofre
+void mostrarStatusLuz() {
+
+  int valorLuz = analogRead(ldr);
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Cofre aberto");
+
+  lcd.setCursor(0, 1);
+
+  if (valorLuz > limiteLuz) {
+    lcd.print("Luz: LIGADA ");
+  } else {
+    lcd.print("Luz: DESLIG");
+  }
+}
+
+// Caso a senha esteja errada
+void senhaErrada() {
+
+  tentativas++;
+
+  senhaDigitada = "";
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Senha errada");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Tentativa ");
+  lcd.print(tentativas);
+
+  tone(buzzer, 500);
+  delay(500);
+  noTone(buzzer);
+
+  delay(1500);
+
+  // Se errar 3 vezes, bloqueia
+  if (tentativas >= 3) {
+
+    bloqueado = true;
+
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+    lcd.print("3 ERROS");
+
+    lcd.setCursor(0, 1);
+    lcd.print("BLOQUEADO");
+
+  } else {
+
+    telaInicial();
+  }
+}
+
+// Reseta o sistema inteiro
+void resetarSistema() {
+
+  noTone(buzzer);
+
+  bloqueado = false;
+  cofreAberto = false;
+  senhaDigitada = "";
+  tentativas = 0;
+
+  // Fecha o cofre
+  servoPorta.write(0);
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Sistema reset");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Solte o botao");
+
+  // Espera soltar o botão
+  while (digitalRead(botaoReset) == LOW) {
+    delay(10);
+  }
+
+  delay(500);
+
+  telaInicial();
+}
+
+// Tela inicial
+void telaInicial() {
+
+  senhaDigitada = "";
+
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Digite senha");
+
+  lcd.setCursor(0, 1);
+  lcd.print("---");
+}
