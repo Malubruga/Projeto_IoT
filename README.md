@@ -126,3 +126,8 @@ Foi possível aplicar conceitos de:
 - Controle de estados
 - Interação com usuário
 - Automação com Arduino
+
+## Diagrama de conexões
+
+<img width="1058" height="721" alt="image" src="https://github.com/user-attachments/assets/13bb9862-e126-4ebd-a90c-b8937dc25565" />
+
