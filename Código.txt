@@ -36,7 +36,7 @@ void setup() {
   // Inicializa o LCD
   lcd.begin(16, 2);
 
-  // Define os botões com resistor interno
+  // Define os botões
   pinMode(botao1, INPUT_PULLUP);
   pinMode(botao2, INPUT_PULLUP);
   pinMode(botao3, INPUT_PULLUP);
