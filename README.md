@@ -2,9 +2,9 @@
 
 ## Alunos
 
-- Bruno Rossi de Lima  
-- Gustavo Novais Cheida
-- Victor Ferraretto Novais
+- Bruno Rossi de Lima  RA: 22.126.098-7
+- Gustavo Novais Cheida RA: 22.126.095-3
+- Victor Ferraretto Novais RA: 22.126.097-9
 
 ## Descrição do Projeto
 
