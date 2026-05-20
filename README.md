@@ -27,7 +27,7 @@ O objetivo é simular um sistema real de segurança, capaz de:
 - Monitoramento de luz interna com sensor LDR
 - Detector de arrombamento
 - Alerta sonoro com buzzer
-- Exibição de informações em display LCD 16x2
+- Exibição de informações em display LCD
 - Abertura física do cofre com servo motor
 
 ---
@@ -53,7 +53,6 @@ O objetivo é simular um sistema real de segurança, capaz de:
 ### Arrombamento
 - Se o cofre estiver fechado e o sensor detectar luz:
   - O sistema identifica como arrombamento
-  - O Servo Motor representa o arrombamento do cofre
   - Um alerta sonoro é acionado
 
 ### Monitoramento de Luz
@@ -72,7 +71,7 @@ O objetivo é simular um sistema real de segurança, capaz de:
 ## Componentes Utilizados
 
 - Arduino Uno
-- Display LCD 16x2
+- Display LCD
 - Potenciômetro (para contraste do LCD)
 - 4 botões (3 senha + 1 reset)
 - Sensor LDR (fotoresistor)
