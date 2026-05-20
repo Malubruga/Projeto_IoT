@@ -29,7 +29,7 @@ bool cofreAberto = false;
 bool arrombado = false;
 
 // Limite de luz para detectar arrombamento
-int limiteLuz = 700;
+int limiteLuz = 300;
 
 void setup() {
 
@@ -89,8 +89,7 @@ void loop() {
     arrombado = true;
     cofreAberto = true;
 
-    // Abre o cofre simulando um arrombamento
-    servoPorta.write(90);
+   
 
     lcd.clear();
 
