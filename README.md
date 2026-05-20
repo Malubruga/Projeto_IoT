@@ -82,40 +82,6 @@ O objetivo é simular um sistema real de segurança, capaz de:
 - Protoboard
 
 ---
-
-## Ligações Principais
-
-### LCD
-- RS → D12  
-- E → D11  
-- D4 → D5  
-- D5 → D4  
-- D6 → D3  
-- D7 → D2  
-
-### Botões
-- Botão 1 → D6  
-- Botão 2 → D7  
-- Botão 3 → D8  
-- Reset → D9  
-- Todos conectados ao GND
-
-### Buzzer
-- Positivo → D10  
-- Negativo → GND  
-
-### Servo Motor
-- Sinal → D13  
-- VCC → 5V  
-- GND → GND  
-
-### LDR (Divisor de tensão)
-- LDR → 5V  
-- LDR → A0  
-- Resistor 10kΩ entre A0 e GND  
-
----
-
 ## Conclusão
 
 O projeto atingiu os objetivos propostos, integrando diferentes componentes de hardware em um sistema funcional de segurança.
